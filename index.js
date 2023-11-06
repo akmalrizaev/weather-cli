@@ -1,5 +1,5 @@
 import getArgs from './helpers/args.js';
-import { getWeather } from './services/api.service.js';
+import { getWeather, getIcon } from './services/api.service.js';
 import {
   printError,
   printSuccess,
@@ -43,6 +43,7 @@ const getForcast = async () => {
     const city = process.env.CITY ?? (await getKeyValue(TOKEN_DICTIONARY.city));
     const response = await getWeather(city);
     printWeather(response, getIcon(response.weather[0].icon));
+    // console.log('🌤️');
   } catch (error) {
     if (error?.response?.status == 404) {
       printError('City not found');
@@ -56,7 +57,6 @@ const getForcast = async () => {
 
 const startCLI = () => {
   const args = getArgs(process.argv);
-  console.log(args);
 
   if (args.h) {
     // help
