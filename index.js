@@ -1,4 +1,5 @@
 import getArgs from './helpers/args.js';
+import { getWeather } from './services/api.service.js';
 import { printError, printSuccess, printHelp } from './services/log.service.js';
 import {
   getKeyValue,
@@ -16,6 +17,22 @@ const saveToken = async (token) => {
     printSuccess('Token was saved');
   } catch (error) {
     printError(error.message);
+  }
+};
+
+const getForcast = async () => {
+  try {
+    const city = process.env.CITY ?? (await getKeyValue(TOKEN_DICTIONARY.city));
+    const response = await getWeather(city);
+    printWeather(response, getIcon(response.weather[0].icon));
+  } catch (error) {
+    if (error?.response?.status == 404) {
+      printError('City not found');
+    } else if (error?.response?.status == 401) {
+      printError('Invalid token');
+    } else {
+      printError(error.message);
+    }
   }
 };
 
@@ -37,6 +54,7 @@ const startCLI = () => {
     return saveToken(args.t);
   }
   // result
+  return getForcast();
 };
 
 startCLI();
